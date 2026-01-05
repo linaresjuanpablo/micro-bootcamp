@@ -1,18 +1,16 @@
 package com.example.bootcamp.domain.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-//@Data
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+public class TechnologySummary {
 
-
-public class CapabilitySummary {
     private Long id;
     private String name;
-    private List<TechnologySummary> technologies;
 }
