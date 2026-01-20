@@ -4,6 +4,7 @@ package com.example.bootcamp.infra.output.webclient.adapter;
 import com.example.bootcamp.domain.model.CapabilitySummary;
 import com.example.bootcamp.domain.ports.out.ICapabilityClientPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -15,12 +16,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 
 public class CapabilityWebClientAdapter implements ICapabilityClientPort {
 
-    private final WebClient webClient = WebClient.create("http://localhost:8092/api/capability");
+    @Qualifier("capabilitywebclient")
 
+    private final WebClient webClient;// = WebClient.create("http://localhost:8092/api/capability");
+
+    public CapabilityWebClientAdapter(@Qualifier("capabilitywebclient") WebClient webClient ){
+        this.webClient = webClient;
+    }
 
     @Override
     public Flux<CapabilitySummary> findByBootcampId(Long bootcampId) {
@@ -31,7 +37,6 @@ public class CapabilityWebClientAdapter implements ICapabilityClientPort {
                 .bodyToFlux(CapabilitySummary.class);
 
     }
-
     @Override
     public Flux<CapabilitySummary> findByIds(List<Long> ids) {
         String idsParam = ids.stream()
