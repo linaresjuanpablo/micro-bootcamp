@@ -13,8 +13,6 @@ public interface IBootcampMapperEntity {
 
     R2BootcampEntity r2Entity(BootcampModel bootcampModel);
 
-    //BootcampModel bootModel(R2BootcampEntity entity);
-
     @Mapping(target = "capabilityIds", ignore = true)
     BootcampModel bootModel(R2BootcampEntity entity);
 
