@@ -28,16 +28,10 @@ public class BootcampDeleteAdapter implements IDeleteBootcampRepositoryPort {
     @Override
     public Flux<CapabilityDeleteSumary> findCapabilitiesByBootcampId(Long bootcampId) {
         return ir2BootcampDeleteRepository.findCapabilityIdsByBootcampId(bootcampId)
-                .flatMap(capabilityId ->
-                ir2BootcampDeleteRepository.findTechnologiesByCapabilityId(capabilityId)
-                        .map(tech -> TechnologyDeleteSummary.builder().id(tech).build())
-                        .collectList()
-                        .map(technologies -> CapabilityDeleteSumary.builder()
-                                .id(capabilityId)
-                                .technologies(technologies)
-                                .build()
-                        )
-                );
+                .map(capabilityId -> CapabilityDeleteSumary.builder()
+                        .id(capabilityId)
+                        .technologies(List.of())
+                        .build());
     }
     @Override
     public Mono<Void> deleteBootcampCapabilityRelations(Long bootcampId) {

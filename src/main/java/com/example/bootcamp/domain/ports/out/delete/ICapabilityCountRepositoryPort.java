@@ -4,5 +4,5 @@ import reactor.core.publisher.Mono;
 
 public interface ICapabilityCountRepositoryPort {
 
-    Mono<Long> countBootcampsByCapability(Long capabilityId);
+    Mono<Long> countCapabilitiesByBootcamp(Long capabilityId);
 }

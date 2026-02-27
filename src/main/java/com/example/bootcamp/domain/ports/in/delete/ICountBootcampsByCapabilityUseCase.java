@@ -4,5 +4,5 @@ import reactor.core.publisher.Mono;
 
 public interface ICountBootcampsByCapabilityUseCase {
 
-    Mono<Long> exceute(Long capabilityId);
+    Mono<Long> exceute(Long bootcampId);
 }

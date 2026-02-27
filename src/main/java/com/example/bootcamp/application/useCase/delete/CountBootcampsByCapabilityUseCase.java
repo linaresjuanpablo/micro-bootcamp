@@ -15,6 +15,6 @@ public class CountBootcampsByCapabilityUseCase implements ICountBootcampsByCapab
 
     @Override
     public Mono<Long> exceute(Long capabilityId) {
-        return capabilityCountRepositoryPort.countBootcampsByCapability(capabilityId);
+        return capabilityCountRepositoryPort.countCapabilitiesByBootcamp(capabilityId);
     }
 }

@@ -13,13 +13,16 @@ public class UseCaseConfig {
     @Bean
     public IDeleteBootcampUseCase iDeleteBootcampUseCase(
             IDeleteBootcampRepositoryPort iDeleteBootcampRepositoryPort,
-            //IDeleteCapabilityClientPort iDeleteCapabilityClientPort,
+            IDeleteCapabilityClientPort iDeleteCapabilityClientPort,
             IDeleteTechnologyClientPort iDeleteTechnologyClientPort,
             TransactionalOperator transactionalOperator
 
     ){
-        return new DeleteBootcampUseCase(iDeleteBootcampRepositoryPort,
-                iDeleteTechnologyClientPort, transactionalOperator);
+        return new DeleteBootcampUseCase(
+                iDeleteBootcampRepositoryPort,
+                iDeleteCapabilityClientPort,
+                iDeleteTechnologyClientPort,
+                transactionalOperator);
     }
 
 }

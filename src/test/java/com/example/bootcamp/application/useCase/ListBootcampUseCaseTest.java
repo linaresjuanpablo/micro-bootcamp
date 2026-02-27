@@ -1,90 +1,134 @@
 package com.example.bootcamp.application.useCase;
 
+
 import com.example.bootcamp.application.useCase.list.ListBootcampUseCase;
 import com.example.bootcamp.domain.model.CapabilitySummary;
-import com.example.bootcamp.domain.model.TechnologySummary;
 import com.example.bootcamp.domain.model.list.BootcampListModel;
+import com.example.bootcamp.domain.model.list.PaginationMetadata;
 import com.example.bootcamp.domain.ports.out.ICapabilityClientPort;
-import com.example.bootcamp.domain.ports.out.ITechnologyClientPort;
 import com.example.bootcamp.domain.ports.out.list.IBootcampCapabilityRepositoryPort;
 import com.example.bootcamp.domain.ports.out.list.IBootcampRepositoryPort;
-import com.example.bootcamp.domain.ports.out.list.IBootcampTechnologyRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.LocalDate;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static reactor.core.publisher.Mono.when;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.when;
 
+
+@ExtendWith(MockitoExtension.class)
 public class ListBootcampUseCaseTest {
 
-    private IBootcampRepositoryPort iBootcampRepositoryPort;
-    private ICapabilityClientPort iCapabilityClientPort;
-    private IBootcampCapabilityRepositoryPort iBootcampCapabilityRepositoryPort;
-    private IBootcampTechnologyRepositoryPort iBootcampTechnologyRepositoryPort;
-    private ITechnologyClientPort iTechnologyClientPort;
+    @Mock
+    private IBootcampRepositoryPort bootcampRepository;
 
+    @Mock
+    private ICapabilityClientPort capabilityClientPort;
+
+    @Mock
+    private IBootcampCapabilityRepositoryPort bootcampCapabilityRepositoryPort;
+
+    @InjectMocks
     private ListBootcampUseCase listBootcampUseCase;
 
-    @BeforeEach
-    void setUp(){
-        iBootcampRepositoryPort = Mockito.mock(IBootcampRepositoryPort.class);
-        iCapabilityClientPort = Mockito.mock(ICapabilityClientPort.class);
-        iBootcampCapabilityRepositoryPort = Mockito.mock(IBootcampCapabilityRepositoryPort.class);
-        iBootcampTechnologyRepositoryPort = Mockito.mock(IBootcampTechnologyRepositoryPort.class);
-        iTechnologyClientPort = Mockito.mock(ITechnologyClientPort.class);
+    private BootcampListModel bootcamp1;
+    private BootcampListModel bootcamp2;
 
-        listBootcampUseCase = new ListBootcampUseCase(
-                iBootcampRepositoryPort,
-                iCapabilityClientPort,
-                iBootcampCapabilityRepositoryPort,
-                iBootcampTechnologyRepositoryPort,
-                iTechnologyClientPort
-        );
-    }
-    @Test
-    void shouldListBootcamsWithCapabilitiesAndTechnologies(){
-        Long bootcampId = 1L;
-        BootcampListModel bootcamp = BootcampListModel.builder()
-                .id(bootcampId)
-                .name("java Bootcamp")
-                .description("Backend training")
-                .launchdate(LocalDate.now())
-                .duration(12)
+    @BeforeEach
+    void setUp() {
+        bootcamp1 = BootcampListModel.builder()
+                .id(1L)
+                .name("Bootcamp Java")
                 .build();
 
-        CapabilitySummary capability = new CapabilitySummary(bootcampId, "Spring Boot", List.of());
-        TechnologySummary technology = new TechnologySummary(bootcampId, "PostgreSQL");
+        bootcamp2 = BootcampListModel.builder()
+                .id(2L)
+                .name("Bootcamp Node.js")
+                .build();
 
-        when(iBootcampRepositoryPort.findAll(any(Integer.class), any(Integer.class), any(), any()))
-                .thenReturn(Flux.just(bootcamp));
-
-        when(iBootcampCapabilityRepositoryPort.findCapabilityIdsByBootcampId(bootcampId))
-                .thenReturn(Flux.just(bootcampId));
-
-        when(iCapabilityClientPort.findByIds(List.of(bootcampId)))
-                .thenReturn(Flux.just(capability));
-
-        when(iBootcampTechnologyRepositoryPort.findTechnologyIdsByBootcampId(bootcampId))
-                .thenReturn(Flux.just(bootcampId));
-
-        when(iTechnologyClientPort.findByids(List.of(bootcampId)))
-                .thenReturn(Flux.just(technology));
-        Flux<BootcampListModel> result = listBootcampUseCase.listBootcamps(0, 10, "name", "asc");
-
-        StepVerifier.create(result)
-                .assertNext(enriched ->{
-                    assert enriched.getCapabilities().size() == 1;
-                    assert enriched.getCapabilities().get(0).getName().equals("Spring Boot");
-                    assert enriched.getTechnologies().size() == 1;
-                    assert enriched.getTechnologies().get(0).getName().equals("PostgreSQL");
-                })
-                .verifyComplete();
 
     }
+
+    @Test
+    void shouldReturnBootcampsWithCapabilitiesAndMetadata() {
+        // Mock repositorio principal
+        when(bootcampRepository.findAll(0, 10, IBootcampRepositoryPort.SortKey.NAME, IBootcampRepositoryPort.SortDirection.ASC))
+                .thenReturn(Flux.just(bootcamp1, bootcamp2));
+
+        // Mock count total
+        when(bootcampRepository.count()).thenReturn(Mono.just(2L));
+
+        // Mock capacidades asociadas
+        when(bootcampCapabilityRepositoryPort.findCapabilityIdsByBootcampId(1L))
+                .thenReturn(Flux.just(100L, 101L));
+        when(bootcampCapabilityRepositoryPort.findCapabilityIdsByBootcampId(2L))
+                .thenReturn(Flux.empty());
+
+        // Mock cliente de capacidades
+        when(capabilityClientPort.findByIds(anyList()))
+                .thenAnswer(invocation -> {
+                    List<Long> ids = invocation.getArgument(0);
+                    return Flux.fromIterable(ids)
+                            .map(id -> CapabilitySummary.builder().id(id).name("Capability-" + id).build());
+                });
+
+        StepVerifier.create(listBootcampUseCase.listBootcampsPage(0, 10, "name", "asc"))
+                .expectNextMatches(response -> {
+                    // Validar metadatos
+                    PaginationMetadata metadata = response.getMetadata();
+                    return metadata.getPage() == 0 &&
+                            metadata.getSize() == 10 &&
+                            metadata.getTotalElements() == 2 &&
+                            metadata.getTotalPages() == 1 &&
+                            metadata.getSortBy().equals("name") &&
+                            metadata.getDirection().equals("asc") &&
+                            // Validar contenido
+                            response.getContent().size() == 2 &&
+                            response.getContent().get(0).getCapabilities().size() == 2 &&
+                            response.getContent().get(1).getCapabilities().isEmpty();
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldHandleEmptyBootcamps() {
+        when(bootcampRepository.findAll(0, 10, IBootcampRepositoryPort.SortKey.NAME, IBootcampRepositoryPort.SortDirection.ASC))
+                .thenReturn(Flux.empty());
+        when(bootcampRepository.count()).thenReturn(Mono.just(0L));
+
+        StepVerifier.create(listBootcampUseCase.listBootcampsPage(0, 10, "name", "asc"))
+                .expectNextMatches(response ->
+                        response.getContent().isEmpty() &&
+                                response.getMetadata().getTotalElements() == 0 &&
+                                response.getMetadata().getTotalPages() == 0
+                )
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldThrowErrorForInvalidSortKey() {
+        StepVerifier.create(listBootcampUseCase.listBootcampsPage(0, 10, "invalid", "asc"))
+                .expectErrorMatches(e -> e instanceof IllegalArgumentException &&
+                        e.getMessage().equals("Invalid sortBy: invalid"))
+
+                .verify();
+    }
+
+    @Test
+    void shouldThrowErrorForInvalidDirection() {
+        StepVerifier.create(listBootcampUseCase.listBootcampsPage(0, 10, "name", "wrong"))
+                .expectErrorMatches(e -> e instanceof IllegalArgumentException &&
+                        e.getMessage().equals("Invalid direction: wrong"))
+                .verify();
+    }
+
+
 }

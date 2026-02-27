@@ -28,8 +28,8 @@ public class R2BootcampListEntity {
     @Column("description")
     private String description;
 
-    @Column("launchDate")
-    private LocalDate launchDate;
+    @Column("launchdate")
+    private LocalDate launchdate;
 
     @Column("duration")
     private Integer duration;

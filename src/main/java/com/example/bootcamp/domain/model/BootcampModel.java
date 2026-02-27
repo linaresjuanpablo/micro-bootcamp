@@ -18,7 +18,7 @@ public class BootcampModel {
     private Long id;
     private String name;
     private String description;
-    private LocalDate launchDate;
+    private LocalDate launchdate;
     private Integer duration;
     private List<Long> capabilityIds;
 

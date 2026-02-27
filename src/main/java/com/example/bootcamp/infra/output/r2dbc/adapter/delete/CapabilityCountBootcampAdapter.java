@@ -16,7 +16,7 @@ public class CapabilityCountBootcampAdapter implements ICapabilityCountRepositor
     private final CapabilityCountMapper capabilityCountMapper;
 
     @Override
-    public Mono<Long> countBootcampsByCapability(Long capabilityId) {
+    public Mono<Long> countCapabilitiesByBootcamp(Long capabilityId) {
         return ir2CapabilityCountBootcampRepository.countByCapabilityId(capabilityId);
     }
 }

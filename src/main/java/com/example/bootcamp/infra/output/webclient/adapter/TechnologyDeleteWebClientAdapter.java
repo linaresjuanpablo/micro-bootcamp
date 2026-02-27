@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class TechnologyDeleteWebClientAdapter implements IDeleteTechnologyClientPort {
 
-    @Qualifier("technologydeletewebclient")
+    //@Qualifier("technologydeletewebclient")
     private final WebClient webClient;
 
     public TechnologyDeleteWebClientAdapter(@Qualifier("technologydeletewebclient") WebClient webClient){

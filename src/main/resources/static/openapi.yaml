@@ -1,0 +1,264 @@
+openapi: 3.0.3
+info:
+  title: Bootcamp API
+  description: API para gestionar bootcamps (crear, listar y eliminar).
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8093/api/bootcamp
+    description: Servidor local de desarrollo
+
+paths:
+
+  /create:
+    post:
+      summary: Crear un nuevo bootcamp
+      description: Crea un bootcamp en el sistema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBootcampRequest'
+            example:
+              name: "Bootcamp Java"
+              description: "Bootcamp intensivo de Java y Spring Boot"
+              capacity: 30
+      responses:
+        '201':
+          description: Bootcamp creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BootcampResponse'
+              example:
+                id: 1
+                name: "Bootcamp Java"
+                description: "Bootcamp intensivo de Java y Spring Boot"
+                capacity: 30
+
+        '400':
+          description: Error de validación en la solicitud
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: "2026-02-23T16:30:00"
+                status: 400
+                error: "Bad Request"
+                code: "ERR_INVALID_CAPACITY"
+                message: "La capacidad debe ser mayor a 0"
+                path: "/api/bootcamp/create"
+
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: "2026-02-23T16:30:00"
+                status: 500
+                error: "Internal Server Error"
+                code: "ERR_INTERNAL_SERVER"
+                message: "Ocurrió un error inesperado"
+                path: "/api/bootcamp/create"
+
+  /delete/{id}:
+    delete:
+      summary: Eliminar un bootcamp
+      description: Elimina un bootcamp y sus relaciones de capacidades/tecnologías.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del bootcamp a eliminar
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Bootcamp eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BootcampDeleteResponseDto'
+              example:
+                bootcampId: 1
+                deletedCapabilities: [100, 101]
+                deletedTechnologies: [200, 201]
+
+        '404':
+          description: Bootcamp no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: "2026-02-23T16:30:00"
+                status: 404
+                error: "Not Found"
+                code: "ERR_BOOTCAMP_NOT_FOUND"
+                message: "El bootcamp no existe"
+                path: "/api/bootcamp/delete/1"
+
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /list:
+    get:
+      summary: Listar bootcamps
+      description: Obtiene una lista paginada de bootcamps.
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            default: name
+        - name: direction
+          in: query
+          schema:
+            type: string
+            default: asc
+      responses:
+        '200':
+          description: Lista de bootcamps
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BootcampPageResponse'
+
+        '400':
+          description: Parámetros inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+
+  schemas:
+
+    CreateBootcampRequest:
+      type: object
+      required:
+        - name
+        - description
+        - capacity
+      properties:
+        name:
+          type: string
+          example: "Bootcamp Java"
+        description:
+          type: string
+          example: "Bootcamp intensivo de Java y Spring Boot"
+        capacity:
+          type: integer
+          minimum: 1
+          example: 30
+
+    BootcampResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        capacity:
+          type: integer
+
+    BootcampDeleteResponseDto:
+      type: object
+      properties:
+        bootcampId:
+          type: integer
+          format: int64
+        deletedCapabilities:
+          type: array
+          items:
+            type: integer
+            format: int64
+        deletedTechnologies:
+          type: array
+          items:
+            type: integer
+            format: int64
+
+    BootcampPageResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/BootcampListResponse'
+        metadata:
+          type: object
+          properties:
+            page:
+              type: integer
+            size:
+              type: integer
+            totalElements:
+              type: integer
+            totalPages:
+              type: integer
+            sortBy:
+              type: string
+            direction:
+              type: string
+
+    BootcampListResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        code:
+          type: string
+          example: ERR_BOOTCAMP_NOT_FOUND
+        message:
+          type: string
+        path:
+          type: string

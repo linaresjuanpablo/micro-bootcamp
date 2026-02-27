@@ -11,7 +11,7 @@ public class R2BootcampListCapabilityEntity {
     private Long id;
     private String name;
     private String description;
-    private LocalDate launchDate;
+    private LocalDate launchdate;
     private Integer duration;
 
     @Column("capability_ids")

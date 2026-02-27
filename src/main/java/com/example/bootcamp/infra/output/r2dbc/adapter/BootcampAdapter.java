@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 
@@ -23,10 +25,22 @@ public class BootcampAdapter implements IBootcampRepositoryPort {
         R2BootcampEntity entity = iBootcampMapperEntity.r2Entity(bootcampModel);
 
         return ir2BootcampRepository.save(entity)
-                .map(savedEntity->
-                        bootcampModel.toBuilder()
-                                .id(savedEntity.getId())
-                                .build());
+                .flatMap(savedEntity->{
+                            Long bootcampId = savedEntity.getId();
+                            List<Mono<Void>> inserts = bootcampModel.getCapabilityIds().stream()
+                                    .map(capId -> ir2BootcampRepository.saveBootcampCapability(bootcampId, capId))
+                                    .toList();
+
+                            return Flux.merge(inserts)
+                                    .then(Mono.just(bootcampModel.toBuilder()
+                                            .id(bootcampId)
+                                            .build()
+                                    ));
+                        });
+
+
+
 
     }
+
 }

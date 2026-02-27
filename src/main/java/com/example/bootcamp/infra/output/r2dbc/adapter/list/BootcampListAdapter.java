@@ -29,4 +29,9 @@ public class BootcampListAdapter implements IBootcampRepositoryPort {
         return ir2BootcampListRepository.findAllPage(size, offset, sortBy.name(), direction.name())
                 .map(bootcampListMapper::toBootcampModel);
     }
+
+    @Override
+    public Mono<Long> count() {
+        return ir2BootcampListRepository.count();
+    }
 }

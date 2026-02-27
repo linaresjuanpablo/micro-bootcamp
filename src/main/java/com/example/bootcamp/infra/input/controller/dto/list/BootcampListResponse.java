@@ -14,8 +14,7 @@ public class BootcampListResponse {
     private Long id;
     private String name;
     private String description;
-    private LocalDate lauchDate;
+    private LocalDate lauchdate;
     private Integer duration;
     private List<CapabilityResponse> capabilities;
-    private List<TechnologyResponse> technologies;
 }

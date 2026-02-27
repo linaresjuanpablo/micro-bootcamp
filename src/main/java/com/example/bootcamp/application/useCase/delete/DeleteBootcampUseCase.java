@@ -1,8 +1,6 @@
 package com.example.bootcamp.application.useCase.delete;
 
 import com.example.bootcamp.domain.exception.ValidationException;
-import com.example.bootcamp.domain.model.CapabilitySummary;
-import com.example.bootcamp.domain.model.TechnologySummary;
 import com.example.bootcamp.domain.model.delete.BootcampDeleteModel;
 import com.example.bootcamp.domain.model.delete.CapabilityDeleteSumary;
 import com.example.bootcamp.domain.model.delete.TechnologyDeleteSummary;
@@ -27,7 +25,7 @@ public class DeleteBootcampUseCase implements IDeleteBootcampUseCase {
     private static final String ERR_BOOTCAMP_NOT_FOUND = "ERR_BOOTCAMP_NOT_FOUND";
 
     private final IDeleteBootcampRepositoryPort iDeleteBootcampRepositoryPort;
-    //private  final IDeleteCapabilityClientPort capabilityClientPort;
+    private  final IDeleteCapabilityClientPort iDeleteCapabilityClientPort;
     private final IDeleteTechnologyClientPort iDeleteTechnologyClientPort;
     private final TransactionalOperator transactionalOperator;
 
@@ -42,11 +40,10 @@ public class DeleteBootcampUseCase implements IDeleteBootcampUseCase {
                 .thenMany(iDeleteBootcampRepositoryPort.findCapabilitiesByBootcampId(bootcampId))
                 .flatMap(capability -> processCapability(capability, deletedCapabilities, deletedTechnologies))
                 .then(iDeleteBootcampRepositoryPort.deleteBootcampCapabilityRelations(bootcampId))
-                .then(iDeleteBootcampRepositoryPort.deleteBootcampCapabilityRelations(bootcampId))
+                //.then(iDeleteBootcampRepositoryPort.deleteBootcampCapabilityRelations(bootcampId))
                 .then(iDeleteBootcampRepositoryPort.deleteBootcamp(bootcampId))
                 .then(Mono.just(new BootcampDeleteModel(bootcampId, deletedCapabilities, deletedTechnologies)))
                 .as(transactionalOperator::transactional);
-
     }
     private Mono<Void> processCapability(
             CapabilityDeleteSumary capability,
@@ -60,23 +57,11 @@ public class DeleteBootcampUseCase implements IDeleteBootcampUseCase {
                         deletedCapabilities.add(capability.getId());
                         return Flux.fromIterable(capability.getTechnologies())
                                         .concatMap(tech -> processTechnology(tech, deleteTechnologies))
-                                                .then();
+                                                .then(iDeleteCapabilityClientPort.deleteCapability(capability.getId()));
                     }
                     return Mono.empty();
                 });
     }
-
-    /*private Mono<Void> deleteCapabilityAndTechnologies(
-            CapabilityDeleteSumary capability,
-            List<Long> deletedCapabilities,
-            List<Long> deletedTechnologies
-    ) {
-
-        return Flux.fromIterable(capability.getTechnologies())
-                .concatMap(tech -> processTechnology(tech, deletedTechnologies))
-                .then(capabilityClientPort.deleteCapability(capability.getId())
-                        .doOnSuccess(v -> deletedCapabilities.add(capability.getId())));
-    }*/
 
     private Mono<Void> processTechnology(
             TechnologyDeleteSummary technology,
@@ -85,6 +70,7 @@ public class DeleteBootcampUseCase implements IDeleteBootcampUseCase {
         return iDeleteTechnologyClientPort.countBootcampsByTechnology(technology.getId())
                 .flatMap(count -> {
                     if (count == 1) {
+                        deletedTechnologies.add(technology.getId());
                         return iDeleteTechnologyClientPort.deleteTechnology(technology.getId());
                     }
                     return Mono.empty();

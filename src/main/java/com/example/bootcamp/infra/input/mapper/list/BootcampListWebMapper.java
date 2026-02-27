@@ -16,7 +16,7 @@ public class BootcampListWebMapper {
                 .id(bootcampListModel.getId())
                 .name(bootcampListModel.getName())
                 .description(bootcampListModel.getDescription())
-                .lauchDate(bootcampListModel.getLaunchDate())
+                .lauchdate(bootcampListModel.getLaunchdate())
                 .duration(bootcampListModel.getDuration())
                 .capabilities(bootcampListModel.getCapabilities().stream()
                         .map(this::toCapabilityResponse)

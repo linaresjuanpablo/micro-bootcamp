@@ -17,6 +17,7 @@ public interface IBootcampRepositoryPort {
     );
     enum SortKey{NAME, CAPACITY_COUNT}
     enum SortDirection {ASC, DESC}
+    Mono<Long> count();
 
 
 }

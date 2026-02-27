@@ -20,27 +20,33 @@ public class WebClientConfig {
                 .build();
     }
 
-
-
-    @Bean(name = "technologywebclient")
+    /*@Bean(name = "technologywebclient")
     public WebClient technologyWebClient(WebClient.Builder builder) {
         return builder.baseUrl("http://localhost:8091") // URL del microservicio de tecnologías
                 .build();
-    }
+    }*/
 
     @Bean(name = "capabilitydeletewebclient")
     public WebClient capabilityDeleteWebClient(WebClient.Builder builder) {
-        return builder.baseUrl("http://localhost:8092") //
+        return builder.baseUrl("http://localhost:8092")
                 .build();
     }
 
     @Bean(name = "technologydeletewebclient")
     public WebClient technologyDeleteWebClient(WebClient.Builder builder) {
-        return builder.baseUrl("http://localhost:8091") //
+        return builder.baseUrl("http://localhost:8091")
+                .build();
+    }
+
+    @Bean(name = "capabilityWebClienTop")
+    public WebClient capabilityWebClienTop(WebClient.Builder builder){
+        return builder.baseUrl("http://localhost:8092")
                 .build();
     }
 
 
 
 
-    }
+
+
+}

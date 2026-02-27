@@ -1,4 +1,4 @@
-package com.example.bootcamp.infra.output.webclient.adapter;
+/*package com.example.bootcamp.infra.output.webclient.adapter;
 
 import com.example.bootcamp.domain.exception.ExternalServiceException;
 import com.example.bootcamp.domain.model.TechnologySummary;
@@ -16,8 +16,6 @@ import java.util.List;
 @Component
 //@RequiredArgsConstructor
 public class TechnologyWebClientAdapter implements ITechnologyClientPort {
-
-    //@Qualifier("technologywebclient")
 
     private final WebClient webClient;// = WebClient.create("http://localhost:8091/api/technology");
 
@@ -61,3 +59,4 @@ public class TechnologyWebClientAdapter implements ITechnologyClientPort {
                 .bodyToFlux(TechnologySummary.class);
     }
 }
+*/

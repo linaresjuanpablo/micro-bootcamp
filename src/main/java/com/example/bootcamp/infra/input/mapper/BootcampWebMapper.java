@@ -12,7 +12,7 @@ public class BootcampWebMapper {
         return BootcampModel.builder()
                 .name(request.getName())
                 .description(request.getDescription())
-                .launchDate(request.getLaunchdate())
+                .launchdate(request.getLaunchdate())
                 .duration(request.getDuration())
                 .capabilityIds(request.getCapabilityIds())
                 .build();
@@ -23,7 +23,7 @@ public class BootcampWebMapper {
                 .id(bootcampModel.getId())
                 .name(bootcampModel.getName())
                 .description(bootcampModel.getDescription())
-                .launchDate(bootcampModel.getLaunchDate())
+                .launchdate(bootcampModel.getLaunchdate())
                 .duration(bootcampModel.getDuration())
                 .capabilityIds(bootcampModel.getCapabilityIds())
                 .build();

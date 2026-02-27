@@ -24,7 +24,7 @@ public class BootcampListMapper {
                 .id(entity.getId())
                 .name(entity.getName())
                 .description(entity.getDescription())
-                .launchDate(entity.getLaunchDate())
+                .launchdate(entity.getLaunchdate())
                 .duration(entity.getDuration())
                 .build();
     }

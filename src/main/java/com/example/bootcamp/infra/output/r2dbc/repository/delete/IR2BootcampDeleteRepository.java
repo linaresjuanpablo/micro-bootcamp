@@ -27,13 +27,13 @@ public interface IR2BootcampDeleteRepository extends ReactiveCrudRepository<R2Bo
     """)
     Mono<Void> deleteTechnologyRelationsByBootcampId(Long bootcampId);
 
-    @Query("""
+    /*@Query("""
     SELECT bt.technology_id
     FROM bootcamp_technology bt
     JOIN bootcamp_capability bc ON bt.bootcamp_id = bc.bootcamp_id
     WHERE bc.capability_id = :capabilityId
 """)
-    Flux<Long> findTechnologiesByCapabilityId(Long capabilityId);
+    Flux<Long> findTechnologiesByCapabilityId(Long capabilityId);*/
 
     @Query("""
         SELECT COUNT(*)

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class CapabilityWebClientAdapter implements ICapabilityClientPort {
 
-    @Qualifier("capabilitywebclient")
+    //@Qualifier("capabilitywebclient")
 
     private final WebClient webClient;// = WebClient.create("http://localhost:8092/api/capability");
 
@@ -44,7 +44,7 @@ public class CapabilityWebClientAdapter implements ICapabilityClientPort {
                 .collect(Collectors.joining(","));
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/by-ids")
+                        .path("/capability/by-ids")
                         .queryParam("ids", idsParam)
                         .build())
                 .retrieve()
